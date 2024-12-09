@@ -301,8 +301,25 @@ function isContainNumber(num, digit) {
  *  [2, 3, 9, 5] => 2       => 2 + 3 === 5 then balance element is 9 and its index = 2
  *  [1, 2, 3, 4, 5] => -1   => no balance element
  */
-function getBalanceIndex(/* arr */) {
-  throw new Error('Not implemented');
+function getBalanceIndex(arr) {
+  if (!Array.isArray(arr) || arr.length === 0) return -1;
+
+  let totalSum = 0;
+  for (let j = 0; j < arr.length; j += 1) {
+    totalSum += arr[j];
+  }
+
+  let leftSum = 0;
+
+  for (let i = 0; i < arr.length; i += 1) {
+    const rightSum = totalSum - leftSum - arr[i];
+    if (leftSum === rightSum) {
+      return i;
+    }
+    leftSum += arr[i];
+  }
+
+  return -1;
 }
 
 /**
@@ -326,8 +343,55 @@ function getBalanceIndex(/* arr */) {
  *          [10, 9,  8,  7]
  *        ]
  */
-function getSpiralMatrix(/* size */) {
-  throw new Error('Not implemented');
+function getSpiralMatrix(size) {
+  if (typeof size !== 'number' || size <= 0) return [];
+
+  const matrix = [];
+  for (let i = 0; i < size; i += 1) {
+    const row = [];
+    for (let j = 0; j < size; j += 1) {
+      row[j] = 0;
+    }
+    matrix[i] = row;
+  }
+
+  let num = 1;
+  let top = 0;
+  let bottom = size - 1;
+  let left = 0;
+  let right = size - 1;
+
+  while (top <= bottom && left <= right) {
+    for (let col = left; col <= right; col += 1) {
+      matrix[top][col] = num;
+      num += 1;
+    }
+    top += 1;
+
+    for (let row = top; row <= bottom; row += 1) {
+      matrix[row][right] = num;
+      num += 1;
+    }
+    right -= 1;
+
+    if (top <= bottom) {
+      for (let col = right; col >= left; col -= 1) {
+        matrix[bottom][col] = num;
+        num += 1;
+      }
+      bottom -= 1;
+    }
+
+    if (left <= right) {
+      for (let row = bottom; row >= top; row -= 1) {
+        matrix[row][left] = num;
+        num += 1;
+      }
+      left += 1;
+    }
+  }
+
+  return matrix;
 }
 
 /**
@@ -345,8 +409,31 @@ function getSpiralMatrix(/* size */) {
  *    [7, 8, 9]         [9, 6, 3]
  *  ]                 ]
  */
-function rotateMatrix(/* matrix */) {
-  throw new Error('Not implemented');
+function rotateMatrix(matrix) {
+  const n = matrix.length;
+  const inputMatrix = matrix;
+  for (let i = 0; i < n; i += 1) {
+    for (let j = i + 1; j < n; j += 1) {
+      const temp = inputMatrix[i][j];
+      inputMatrix[i][j] = inputMatrix[j][i];
+      inputMatrix[j][i] = temp;
+    }
+  }
+
+  for (let i = 0; i < n; i += 1) {
+    let left = 0;
+    let right = n - 1;
+    while (left < right) {
+      const temp = inputMatrix[i][left];
+      inputMatrix[i][left] = inputMatrix[i][right];
+      inputMatrix[i][right] = temp;
+
+      left += 1;
+      right -= 1;
+    }
+  }
+
+  return inputMatrix;
 }
 
 /**
@@ -363,8 +450,15 @@ function rotateMatrix(/* matrix */) {
  *  [2, 9, 5, 9]    => [2, 5, 9, 9]
  *  [-2, 9, 5, -3]  => [-3, -2, 5, 9]
  */
-function sortByAsc(/* arr */) {
-  throw new Error('Not implemented');
+function sortByAsc(arr) {
+  for (let i = 1; i < arr.length; i += 1)
+    for (let j = 0; j < i; j += 1)
+      if (arr[i] < arr[j]) {
+        const resultArr = arr;
+        const x = resultArr[i];
+        resultArr[i] = arr[j];
+        resultArr[j] = x;
+      }
 }
 
 /**
@@ -387,7 +481,6 @@ function sortByAsc(/* arr */) {
 function shuffleChar(/* str, iterations */) {
   throw new Error('Not implemented');
 }
-
 /**
  * Returns the nearest largest integer consisting of the digits of the given positive integer.
  * If there is no such number, it returns the original number.
@@ -405,8 +498,55 @@ function shuffleChar(/* str, iterations */) {
  * @param {number} number The source number
  * @returns {number} The nearest larger number, or original number if none exists.
  */
-function getNearestBigger(/* number */) {
-  throw new Error('Not implemented');
+function getNearestBigger(number) {
+  if (typeof number !== 'number' || number <= 0) return number;
+
+  const digits = [];
+  let temp = number;
+  while (temp > 0) {
+    digits.unshift(temp % 10);
+    temp = Math.floor(temp / 10);
+  }
+
+  const n = digits.length;
+
+  let pivot = -1;
+  for (let i = n - 2; i >= 0; i -= 1) {
+    if (digits[i] < digits[i + 1]) {
+      pivot = i;
+      break;
+    }
+  }
+  if (pivot === -1) return number;
+
+  let swapIndex = -1;
+  for (let i = n - 1; i > pivot; i -= 1) {
+    if (digits[i] > digits[pivot]) {
+      swapIndex = i;
+      break;
+    }
+  }
+
+  const tempDigit = digits[pivot];
+  digits[pivot] = digits[swapIndex];
+  digits[swapIndex] = tempDigit;
+
+  let left = pivot + 1;
+  let right = n - 1;
+  while (left < right) {
+    const swapTemp = digits[left];
+    digits[left] = digits[right];
+    digits[right] = swapTemp;
+    left += 1;
+    right -= 1;
+  }
+
+  let result = 0;
+  for (let i = 0; i < n; i += 1) {
+    result = result * 10 + digits[i];
+  }
+
+  return result;
 }
 
 module.exports = {
